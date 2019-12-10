@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.github.zacscoding.blockscouter;
+package com.github.zacscoding.blockscouter.health;
+
+import com.codahale.metrics.health.HealthCheck;
 
 /**
- *
+ * Health check listener
  */
-public class cc {
+@FunctionalInterface
+public interface HealthCheckListener<T extends HealthIndicator> {
+
+    /**
+     * Listen to change of a state
+     */
+    void onStateChanged(T healthChecker, HealthCheck.Result prev, HealthCheck.Result current);
 }
