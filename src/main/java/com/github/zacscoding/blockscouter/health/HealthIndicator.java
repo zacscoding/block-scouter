@@ -16,7 +16,7 @@
 
 package com.github.zacscoding.blockscouter.health;
 
-import static java.util.Objects.requireNonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Objects;
 
@@ -31,8 +31,8 @@ public abstract class HealthIndicator extends HealthCheck {
     private String name;
 
     public HealthIndicator(String chainId, String name) {
-        this.chainId = requireNonNull(chainId, "chainId");
-        this.name = requireNonNull(name, "name");
+        this.chainId = checkNotNull(chainId, "chainId");
+        this.name = checkNotNull(name, "name");
     }
 
     public String getChainId() {

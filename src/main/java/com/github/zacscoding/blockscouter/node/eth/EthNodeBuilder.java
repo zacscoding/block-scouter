@@ -15,7 +15,10 @@
  */
 package com.github.zacscoding.blockscouter.node.eth;
 
-import static java.util.Objects.requireNonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.github.zacscoding.blockscouter.health.eth.EthHealthIndicatorType;
+import com.github.zacscoding.blockscouter.health.eth.EthHealthIndicatorType.EthConnectedOnly;
 
 /**
  * Ethereum node config builder
@@ -24,7 +27,7 @@ public class EthNodeBuilder {
 
     private String chainId = Defaults.CHAIN_ID;
 
-    private String name = Defaults.NAME;
+    private String name;
 
     private String rpcUrl = Defaults.RPC_URL;
 
@@ -36,21 +39,23 @@ public class EthNodeBuilder {
 
     private long pendingTransactionPollingInterval = Defaults.PENDING_TRANSACTION_POLLING_INTERVAL;
 
+    private EthHealthIndicatorType healthIndicatorType = Defaults.HEALTH_INDICATOR_TYPE;
+
     public static EthNodeBuilder builder(String name) {
         return new EthNodeBuilder(name);
     }
 
     public EthNodeBuilder(String name) {
-        this.name = requireNonNull(name, name);
+        this.name = checkNotNull(name, name);
     }
 
     public EthNodeBuilder chainId(String chainId) {
-        this.chainId = requireNonNull(chainId, "chainId");
+        this.chainId = checkNotNull(chainId, "chainId");
         return this;
     }
 
     public EthNodeBuilder rpcUrl(String rpcUrl) {
-        this.rpcUrl = requireNonNull(rpcUrl, "rpcUrl");
+        this.rpcUrl = checkNotNull(rpcUrl, "rpcUrl");
         return this;
     }
 
@@ -59,18 +64,18 @@ public class EthNodeBuilder {
             throw new IllegalStateException("Block time must be greater than or equals to 1000L");
         }
 
-        this.blockTime = requireNonNull(blockTime, "blockTime");
+        this.blockTime = checkNotNull(blockTime, "blockTime");
         return this;
     }
 
     public EthNodeBuilder subscribeNewBlock(boolean subscribeNewBlock) {
-        this.subscribeNewBlock = requireNonNull(subscribeNewBlock, "subscribeNewBlock");
+        this.subscribeNewBlock = checkNotNull(subscribeNewBlock, "subscribeNewBlock");
         return this;
     }
 
     public EthNodeBuilder subscribePendingTransaction(boolean subscribePendingTransaction) {
-        this.subscribePendingTransaction = requireNonNull(subscribePendingTransaction,
-                                                          "subscribePendingTransaction");
+        this.subscribePendingTransaction = checkNotNull(subscribePendingTransaction,
+                                                        "subscribePendingTransaction");
         return this;
     }
 
@@ -79,8 +84,14 @@ public class EthNodeBuilder {
             throw new IllegalStateException("Block time must be greater than or equals to 0L");
         }
 
-        this.pendingTransactionPollingInterval = requireNonNull(pendingTransactionPollingInterval,
-                                                                "pendingTransactionPollingInterval");
+        this.pendingTransactionPollingInterval = checkNotNull(pendingTransactionPollingInterval,
+                                                              "pendingTransactionPollingInterval");
+        return this;
+    }
+
+    public EthNodeBuilder healthIndicatorType(EthHealthIndicatorType healthIndicatorType) {
+        this.healthIndicatorType = checkNotNull(healthIndicatorType, "healthIndicatorType");
+
         return this;
     }
 
@@ -89,17 +100,18 @@ public class EthNodeBuilder {
      */
     public EthNodeConfig build() {
         return new EthNodeConfig(chainId, name, rpcUrl, blockTime, subscribeNewBlock,
-                                 subscribePendingTransaction, pendingTransactionPollingInterval);
+                                 subscribePendingTransaction, pendingTransactionPollingInterval,
+                                 healthIndicatorType);
     }
 
     private static final class Defaults {
 
         private static final String CHAIN_ID = "0";
-        private static final String NAME = "NODE0";
         private static final String RPC_URL = "http://localhost:8545";
         private static final long BLOCK_TIME = 15000L;
         private static final boolean SUBSCRIBE_NEW_BLOCK = false;
         private static final boolean SUBSCRIBE_PENDING_TRANSACTION = false;
         private static final long PENDING_TRANSACTION_POLLING_INTERVAL = 0L;
+        private static final EthHealthIndicatorType HEALTH_INDICATOR_TYPE = EthConnectedOnly.INSTANCE;
     }
 }

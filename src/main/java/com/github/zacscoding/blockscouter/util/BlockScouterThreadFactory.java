@@ -16,7 +16,7 @@
 
 package com.github.zacscoding.blockscouter.util;
 
-import static java.util.Objects.requireNonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -38,8 +38,8 @@ public class BlockScouterThreadFactory implements ThreadFactory {
     }
 
     public BlockScouterThreadFactory(String threadName, boolean daemon) {
-        this.threadName = requireNonNull(threadName, "threadName")
-                          + "-"
+        this.threadName = checkNotNull(threadName, "threadName")
+                          + '-'
                           + THREAD_FACTORY_NUMBER.incrementAndGet();
         this.daemon = daemon;
     }

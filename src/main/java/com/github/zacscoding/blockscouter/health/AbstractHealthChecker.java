@@ -16,7 +16,9 @@
 
 package com.github.zacscoding.blockscouter.health;
 
-import static java.util.Objects.requireNonNull;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -68,13 +70,8 @@ public class AbstractHealthChecker<H extends HealthIndicator> implements HealthC
                 return;
             }
 
-            if (initDelay < 0L) {
-                throw new IllegalArgumentException("initDelay must be greater than or equal to 0");
-            }
-
-            if (period <= 0L) {
-                throw new IllegalArgumentException("period must be greater than 0");
-            }
+            checkArgument(initDelay >= 0L, "initDelay must be greater than or equal to 0");
+            checkArgument(period > 0L, "period must be greater than 0");
 
             if (scheduledExecutor == null) {
                 scheduledExecutor = Executors.newSingleThreadScheduledExecutor(
@@ -125,7 +122,7 @@ public class AbstractHealthChecker<H extends HealthIndicator> implements HealthC
     public boolean addIndicator(H healthIndicator) {
         ensureRunningState("Must start health checker before adding a indicator");
 
-        requireNonNull(healthIndicator, "healthIndicator");
+        checkNotNull(healthIndicator, "healthIndicator");
 
         try {
             healthCheckRegistry.register(healthIndicator.getName(), healthIndicator);
@@ -140,7 +137,7 @@ public class AbstractHealthChecker<H extends HealthIndicator> implements HealthC
     @Override
     public void removeIndicator(String name) {
         ensureRunningState("Must start health checker before remove a indicator");
-        healthCheckRegistry.unregister(requireNonNull(name, "name"));
+        healthCheckRegistry.unregister(checkNotNull(name, "name"));
         resultMap.remove(name);
     }
 
@@ -171,18 +168,16 @@ public class AbstractHealthChecker<H extends HealthIndicator> implements HealthC
 
     @Override
     public Optional<H> getIndicator(String name) {
-        return Optional.ofNullable((H) healthCheckRegistry.getHealthCheck(requireNonNull(name, "name")));
+        return Optional.ofNullable((H) healthCheckRegistry.getHealthCheck(checkNotNull(name, "name")));
     }
 
     @Override
     public Optional<Result> getHealthCheckResult(String name) {
-        return Optional.ofNullable(resultMap.get(requireNonNull(name, "name")));
+        return Optional.ofNullable(resultMap.get(checkNotNull(name, "name")));
     }
 
     private void ensureRunningState(String errorMessage) {
-        if (!isRunning()) {
-            throw new IllegalStateException(errorMessage);
-        }
+        checkState(isRunning(), errorMessage);
     }
 
     private void doHealthCheck() {

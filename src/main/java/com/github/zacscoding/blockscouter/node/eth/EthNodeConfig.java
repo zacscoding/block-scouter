@@ -15,6 +15,7 @@
  */
 package com.github.zacscoding.blockscouter.node.eth;
 
+import com.github.zacscoding.blockscouter.health.eth.EthHealthIndicatorType;
 import com.google.common.base.MoreObjects;
 
 /**
@@ -25,40 +26,46 @@ public class EthNodeConfig {
     /***
      * Ethereum chain id (network id)
      */
-    private String chainId;
+    private final String chainId;
 
     /**
      * Name of a node
      */
-    private String name;
+    private final String name;
 
     /**
      * Rpc url of a node (IPC, HTTP, WEBSOCKET)
      */
-    private String rpcUrl;
+    private final String rpcUrl;
 
     /**
      * Average time of a block creation in milliseconds
      */
-    private long blockTime;
+    private final long blockTime;
 
     /**
      * subscribe a new block or not
      */
-    private boolean subscribeNewBlock;
+    private final boolean subscribeNewBlock;
 
     /**
      * subscribe a new pending transaction or not
      */
-    private boolean subscribePendingTransaction;
+    private final boolean subscribePendingTransaction;
 
     /**
      * polling interval
      */
-    private long pendingTransactionPollingInterval;
+    private final long pendingTransactionPollingInterval;
+
+    /**
+     * indicator for health check
+     */
+    private EthHealthIndicatorType healthIndicatorType;
 
     EthNodeConfig(String chainId, String name, String rpcUrl, long blockTime, boolean subscribeNewBlock,
-                  boolean subscribePendingTransaction, long pendingTransactionPollingInterval) {
+                  boolean subscribePendingTransaction, long pendingTransactionPollingInterval,
+                  EthHealthIndicatorType healthIndicatorType) {
 
         this.chainId = chainId;
         this.name = name;
@@ -67,6 +74,7 @@ public class EthNodeConfig {
         this.subscribeNewBlock = subscribeNewBlock;
         this.subscribePendingTransaction = subscribePendingTransaction;
         this.pendingTransactionPollingInterval = pendingTransactionPollingInterval;
+        this.healthIndicatorType = healthIndicatorType;
     }
 
     public String getChainId() {
@@ -97,6 +105,10 @@ public class EthNodeConfig {
         return pendingTransactionPollingInterval;
     }
 
+    public EthHealthIndicatorType getHealthIndicatorType() {
+        return healthIndicatorType;
+    }
+
     @Override
     public String toString() {
         return MoreObjects
@@ -107,6 +119,7 @@ public class EthNodeConfig {
                 .add("subscribeNewBlock", subscribeNewBlock)
                 .add("subscribePendingTransaction", subscribePendingTransaction)
                 .add("pendingTransactionPollingInterval", pendingTransactionPollingInterval)
+                .add("healthIndicatorType", healthIndicatorType)
                 .toString();
     }
 }
