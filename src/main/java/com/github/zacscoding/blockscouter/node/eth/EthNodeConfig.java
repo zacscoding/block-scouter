@@ -16,12 +16,14 @@
 package com.github.zacscoding.blockscouter.node.eth;
 
 import com.github.zacscoding.blockscouter.health.eth.EthHealthIndicatorType;
+import com.github.zacscoding.blockscouter.node.NodeConfig;
+import com.github.zacscoding.blockscouter.node.enums.BlockchainType;
 import com.google.common.base.MoreObjects;
 
 /**
  * Configuration of a ethereum node
  */
-public class EthNodeConfig {
+public class EthNodeConfig implements NodeConfig {
 
     /***
      * Ethereum chain id (network id)
@@ -121,5 +123,10 @@ public class EthNodeConfig {
                 .add("pendingTransactionPollingInterval", pendingTransactionPollingInterval)
                 .add("healthIndicatorType", healthIndicatorType)
                 .toString();
+    }
+
+    @Override
+    public BlockchainType getBlockchainType() {
+        return BlockchainType.ETHEREUM;
     }
 }

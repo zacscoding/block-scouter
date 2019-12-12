@@ -23,7 +23,7 @@ import com.github.zacscoding.blockscouter.health.eth.EthHealthIndicatorType.EthC
 /**
  * Ethereum node config builder
  */
-public class EthNodeBuilder {
+public final class EthNodeBuilder {
 
     private String chainId = Defaults.CHAIN_ID;
 
@@ -45,7 +45,7 @@ public class EthNodeBuilder {
         return new EthNodeBuilder(name);
     }
 
-    public EthNodeBuilder(String name) {
+    private EthNodeBuilder(String name) {
         this.name = checkNotNull(name, name);
     }
 

@@ -17,9 +17,13 @@ package com.github.zacscoding.blockscouter.node.eth;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Optional;
+
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.response.EthBlock;
 
 import com.codahale.metrics.health.HealthCheck.Result;
 import com.github.zacscoding.blockscouter.health.eth.EthHealthIndicator;
@@ -142,6 +146,35 @@ public class EthNode implements Node<EthHealthIndicator> {
         return nodeConfig.getPendingTransactionPollingInterval();
     }
 
+    /**
+     * Returns a new {@link EthBlock} stream
+     *
+     * @return new block stream if subscribe new blocks, otherwise empty
+     */
+    public Optional<Publisher<EthBlock>> getBlockStream() {
+        if (!nodeConfig.isSubscribeNewBlock()) {
+            return Optional.empty();
+        }
+
+        ensureInitialized("Node must be initialized before getting block stream");
+
+        return Optional.of(nodeObserver.getBlockStream());
+    }
+
+    /**
+     * Returns a new pending transaction hash stream
+     *
+     * @return new pending transactions stream if subscribe pending transactions, otherwise empty
+     */
+    public Optional<Publisher<String>> getPendingTransactionStream() {
+        if (!nodeConfig.isSubscribePendingTransaction()) {
+            return Optional.empty();
+        }
+
+        ensureInitialized("Node must be initialized before getting pending tx stream");
+        return Optional.of(nodeObserver.getPendingTransactionStream());
+    }
+
     // start to subscribe new blocks, pending transactions
     private void startSubscribe() {
         if (nodeConfig.isSubscribeNewBlock()) {
@@ -169,6 +202,12 @@ public class EthNode implements Node<EthHealthIndicator> {
     private void createObserverIfNull() {
         if (nodeObserver == null) {
             nodeObserver = new EthNodeObserver(this);
+        }
+    }
+
+    private void ensureInitialized(String errorMessage) {
+        if (!initialized) {
+            throw new IllegalStateException(errorMessage);
         }
     }
 }

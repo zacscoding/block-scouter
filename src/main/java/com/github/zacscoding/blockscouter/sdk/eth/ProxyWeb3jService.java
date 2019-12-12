@@ -16,11 +16,17 @@
 
 package com.github.zacscoding.blockscouter.sdk.eth;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
-import java.lang.reflect.Proxy;
-import java.util.function.Function;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jService;
 
 import com.google.common.reflect.Reflection;
@@ -28,36 +34,58 @@ import com.google.common.reflect.Reflection;
 /**
  * Proxy web3j service
  */
-public class ProxyWeb3jService {
+public final class ProxyWeb3jService {
 
-    private final Function<Integer, Web3jService> delegate;
+    private static final Logger logger = LoggerFactory.getLogger(ProxyWeb3jService.class);
 
-    public ProxyWeb3jService(Function<Integer, Web3jService> delegate) {
-        this.delegate = checkNotNull(delegate);
+    private final List<Web3jService> web3jServices;
+    private final Web3jService proxyWeb3jService;
+    private final Web3j web3j;
+    private final AtomicLong indexGenerator;
+
+    public static ProxyWeb3jService build(List<Web3jService> web3jServices) {
+        return new ProxyWeb3jService(web3jServices);
+    }
+
+    private ProxyWeb3jService(List<Web3jService> web3jServices) {
+        checkArgument(web3jServices != null && !web3jServices.isEmpty(), "web3jServices");
+        this.web3jServices = new ArrayList<>(web3jServices);
+
+        indexGenerator = new AtomicLong(0L);
+        proxyWeb3jService = createProxyWeb3jService();
+        web3j = Web3j.build(proxyWeb3jService);
+    }
+
+    public Web3j getWeb3j() {
+        return web3j;
     }
 
     public Web3jService getProxyWeb3jService() {
+        return proxyWeb3jService;
+    }
+
+    private Web3jService createProxyWeb3jService() {
         return Reflection.newProxy(Web3jService.class, (proxy, method, args) -> {
-            Exception lastException = null;
-            final int request = 0;
-//                    while (true) {
-//
-//                    }
-//
-//                    for (int i = 0; i < services.size(); i++) {
-//                        final int idx = (start + i) % services.size();
-//
-//                        try {
-//                            return method.invoke(services.get(idx), args);
-//                        } catch (Exception e) {
-//                            lastException = e;
-//                        }
-//                    }
-//
-//                    if (lastException == null) {
-//                        lastException = new IOException("possible error ?? after calling all web3j in proxy?");
-//                    }
-            throw lastException;
+
+            final int size = web3jServices.size();
+            final int startIndex = (int) indexGenerator.getAndIncrement();
+            Throwable exception = null;
+
+            for (int i = 0; i < size; i++) {
+                // IllegalAccessException, IllegalArgumentException, InvocationTargetException
+                try {
+                    final int idx = (startIndex + i) % web3jServices.size();
+                    return method.invoke(web3jServices.get(idx), args);
+                } catch (InvocationTargetException e) {
+                    exception = e.getTargetException() != null ?
+                                e.getTargetException() : new IOException("unknown exception");
+                } catch (Exception e) {
+                    logger.warn("Unexpected exception occur after invoke Web3jService. {}", e);
+                    exception = new IOException("unknown exception");
+                }
+            }
+
+            throw exception;
         });
     }
 }
