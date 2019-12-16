@@ -2,7 +2,41 @@
 ; Subscribe block chain events such as ethereum.
 
 > ## Getting started
-; will be added 
+
+**maven**  
+
+```aidl
+
+<repositories>
+  <repository>
+    <id>jcenter</id>
+    <url>https://jcenter.bintray.com/</url>
+  </repository>
+</repositories>
+
+...
+
+
+<dependency>
+	<groupId>com.github.zacscoding</groupId>
+	<artifactId>block-scouter</artifactId>
+	<version>0.1</version>
+</dependency>
+```
+
+**gradle**  
+
+```aidl
+
+repositories {
+    jecenter()
+}
+
+...
+
+compile 'com.github.zacscoding:block-scouter:0.1'
+
+``` 
 
 > ## Building a ethereum chain  
 [See](src/test/java/com/github/zacscoding/blockscouter/dev/ChainManagerConsoleTest.java)
@@ -15,7 +49,7 @@
 
 > chain config
 
-```aidl
+```
 final EthChainConfig chainConfig = EthChainConfigBuilder.builder()
                                            .chainId("36435") // ethereum chain id
                                            .blockTime(5000L) // average block time
@@ -26,13 +60,13 @@ final EthChainConfig chainConfig = EthChainConfigBuilder.builder()
 
 > node manager
 
-```aidl
+```
 final EthNodeManager nodeManager = new EthNodeManager();
 ```
 
 > rpc service factory
 
-```aidl
+```
 final EthRpcServiceFactory rpcServiceFactory = new DefaultEthRpcServiceFactory();
 ``` 
 
@@ -52,7 +86,7 @@ node1 = EthNodeConfigBuilder.builder("node1")
 
 > build a ethereum chain
 
-```aidl
+```
 final EthChainManager chainManager = new EthChainManager(chainConfig,
                                                          nodeManager,
                                                          chainReader,
@@ -66,7 +100,7 @@ chainManager.addNode(node1, false);
 
 > EthChainReader
 
-```aidl
+```
 public interface EthChainReader {
 
     /**
@@ -83,7 +117,7 @@ public interface EthChainReader {
 
 > EthChainListener
 
-```aidl
+```
 public interface EthChainListener {
 
     /**

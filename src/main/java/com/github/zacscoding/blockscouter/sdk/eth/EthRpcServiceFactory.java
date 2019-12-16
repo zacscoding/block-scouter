@@ -17,7 +17,9 @@
 package com.github.zacscoding.blockscouter.sdk.eth;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.web3j.protocol.Service;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.ipc.IpcService;
 import org.web3j.protocol.ipc.UnixIpcService;
@@ -27,6 +29,8 @@ import org.web3j.protocol.websocket.WebSocketService;
 import com.github.zacscoding.blockscouter.exception.SDKCreateException;
 import com.github.zacscoding.blockscouter.node.eth.EthNode;
 
+import okhttp3.OkHttpClient;
+
 /**
  * Web3j factory
  */
@@ -34,33 +38,38 @@ import com.github.zacscoding.blockscouter.node.eth.EthNode;
 public interface EthRpcServiceFactory {
 
     /**
-     * Create a {@link Web3j} given ethereum node
+     * Create a {@link Service} given ethereum node
      *
      * @throws SDKCreateException throw exception if invalid rpc url in given node
      */
-    Web3j createWeb3j(EthNode ethNode);
+    Web3jService createWeb3jService(EthNode ethNode);
 
     /**
-     * build web3j from ipc service
+     * Create a {@link IpcService} given {@link EthNode}
      */
-    static Web3j buildWeb3jFromIpcService(EthNode ethNode) throws Exception {
-        IpcService ipcService = SystemUtils.IS_OS_WINDOWS ? new WindowsIpcService(ethNode.getRpcUrl())
-                                                          : new UnixIpcService(ethNode.getRpcUrl());
-
-        return Web3j.build(ipcService);
+    static Web3jService createIpcService(EthNode ethNode) throws Exception {
+        return SystemUtils.IS_OS_WINDOWS ? new WindowsIpcService(ethNode.getRpcUrl())
+                                         : new UnixIpcService(ethNode.getRpcUrl());
     }
 
     /**
-     * build web3j from http service
+     * Create a {@link HttpService} given {@link EthNode}
      */
-    static Web3j buildWeb3jFromHttpService(EthNode ethNode) throws Exception {
-        return Web3j.build(new HttpService(ethNode.getRpcUrl()));
+    static Web3jService createHttpService(EthNode ethNode) throws Exception {
+        return new HttpService(ethNode.getRpcUrl());
     }
 
     /**
-     * build web3j from websocket service
+     * Create a {@link HttpService} given {@link EthNode} and {@link OkHttpClient}
      */
-    static Web3j buildWeb3jFromWebsocketService(EthNode ethNode) throws Exception {
-        return Web3j.build(new WebSocketService(ethNode.getRpcUrl(), false));
+    static Web3jService createHttpService(EthNode ethNode, OkHttpClient httpClient) throws Exception {
+        return new HttpService(ethNode.getRpcUrl(), httpClient);
+    }
+
+    /**
+     * Create a {@link WebSocketService} given {@link EthNode} and {@link OkHttpClient}
+     */
+    static Web3jService createWebSocketService(EthNode ethNode) throws Exception {
+        return new WebSocketService(ethNode.getRpcUrl(), false);
     }
 }

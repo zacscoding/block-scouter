@@ -17,21 +17,17 @@
 package com.github.zacscoding.blockscouter.sdk.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.net.ConnectException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.ipc.IpcService;
 import org.web3j.protocol.websocket.WebSocketService;
 
-import com.github.zacscoding.blockscouter.exception.SDKCreateException;
 import com.github.zacscoding.blockscouter.node.eth.EthNode;
 
 public class EthRpcServiceFactoryTest {
@@ -51,11 +47,11 @@ public class EthRpcServiceFactoryTest {
         when(node.getRpcUrl()).thenReturn("/home/app/node.ipc");
 
         // when
-        final Web3j web3j = rpcServiceFactory.createWeb3j(node);
+        final Web3jService web3jService = rpcServiceFactory.createWeb3jService(node);
 
         // then
-        assertThat(web3j.getWeb3jService()).isNotNull();
-        assertThat(web3j.getWeb3jService() instanceof IpcService).isTrue();
+        assertThat(web3jService).isNotNull();
+        assertThat(web3jService instanceof IpcService).isTrue();
     }
 
     @Test
@@ -65,11 +61,11 @@ public class EthRpcServiceFactoryTest {
         when(node.getRpcUrl()).thenReturn("http://localhost:8545");
 
         // when
-        final Web3j web3j = rpcServiceFactory.createWeb3j(node);
+        final Web3jService web3jService = rpcServiceFactory.createWeb3jService(node);
 
         // then
-        assertThat(web3j.getWeb3jService()).isNotNull();
-        assertThat(web3j.getWeb3jService() instanceof HttpService).isTrue();
+        assertThat(web3jService).isNotNull();
+        assertThat(web3jService instanceof HttpService).isTrue();
     }
 
     @Test
@@ -79,10 +75,10 @@ public class EthRpcServiceFactoryTest {
         when(node.getRpcUrl()).thenReturn("ws://localhost:1");
 
         // when
-        final Web3j web3j = rpcServiceFactory.createWeb3j(node);
+        final Web3jService web3jService = rpcServiceFactory.createWeb3jService(node);
 
         // then
-        assertThat(web3j.getWeb3jService()).isNotNull();
-        assertThat(web3j.getWeb3jService() instanceof WebSocketService).isTrue();
+        assertThat(web3jService).isNotNull();
+        assertThat(web3jService instanceof WebSocketService).isTrue();
     }
 }

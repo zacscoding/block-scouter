@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
@@ -45,6 +46,7 @@ import com.github.zacscoding.blockscouter.sdk.eth.EthRpcServiceFactory;
 /**
  * Chain manager IT
  */
+@Disabled
 public class ChainManagerConsoleTest {
 
     EthChainConfig chainConfig;

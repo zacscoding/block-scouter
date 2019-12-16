@@ -97,7 +97,7 @@ public class EthHealthIndicator extends HealthIndicator {
         try {
             return node.getWeb3j().ethSyncing().send().getResult();
         } catch (Exception e) {
-            final Web3jService web3jService = node.getWeb3j().getWeb3jService();
+            final Web3jService web3jService = node.getWeb3jService();
 
             // throw exception if not web socket service
             if (!(web3jService instanceof WebSocketService)) {

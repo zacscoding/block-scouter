@@ -19,7 +19,7 @@ package com.github.zacscoding.blockscouter.sdk.eth;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.commons.lang3.StringUtils;
-import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jService;
 
 import com.github.zacscoding.blockscouter.exception.SDKCreateException;
 import com.github.zacscoding.blockscouter.node.eth.EthNode;
@@ -30,7 +30,7 @@ import com.github.zacscoding.blockscouter.node.eth.EthNode;
 public class DefaultEthRpcServiceFactory implements EthRpcServiceFactory {
 
     @Override
-    public Web3j createWeb3j(EthNode ethNode) throws SDKCreateException {
+    public Web3jService createWeb3jService(EthNode ethNode) {
         try {
             final String rpcUrl = checkNotNull(ethNode.getRpcUrl(), "ethNode.rpcUrl");
 
@@ -40,16 +40,16 @@ public class DefaultEthRpcServiceFactory implements EthRpcServiceFactory {
 
             // 1) websocket
             if (rpcUrl.startsWith("ws://")) {
-                return EthRpcServiceFactory.buildWeb3jFromWebsocketService(ethNode);
+                return EthRpcServiceFactory.createWebSocketService(ethNode);
             }
 
             // 2) http
             if (rpcUrl.startsWith("http://") || rpcUrl.startsWith("https://")) {
-                return EthRpcServiceFactory.buildWeb3jFromHttpService(ethNode);
+                return EthRpcServiceFactory.createHttpService(ethNode);
             }
 
             // 3) ipc
-            return EthRpcServiceFactory.buildWeb3jFromIpcService(ethNode);
+            return EthRpcServiceFactory.createIpcService(ethNode);
         } catch (Exception e) {
             throw new SDKCreateException(e);
         }

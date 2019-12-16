@@ -46,5 +46,8 @@ public interface ChainManager<N extends Node<?>, NC extends NodeConfig> {
      */
     void removeNode(String name);
 
+    /**
+     * Return active nodes i.e healthy in chain
+     */
     List<N> getActiveNodes();
 }

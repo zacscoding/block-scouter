@@ -23,6 +23,7 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
 import com.codahale.metrics.health.HealthCheck.Result;
@@ -45,6 +46,7 @@ public class EthNode implements Node<EthHealthIndicator> {
     private final EthRpcServiceFactory rpcServiceFactory;
 
     // build
+    private Web3jService web3jService;
     private Web3j web3j;
     private EthNodeObserver nodeObserver;
     private EthHealthIndicator healthIndicator;
@@ -104,7 +106,8 @@ public class EthNode implements Node<EthHealthIndicator> {
 
         // web3j
         try {
-            web3j = rpcServiceFactory.createWeb3j(this);
+            web3jService = rpcServiceFactory.createWeb3jService(this);
+            web3j = Web3j.build(web3jService);
         } catch (Exception e) {
             logger.warn("Exception occur while building web3j. {}", nodeConfig, e);
         }
@@ -137,6 +140,13 @@ public class EthNode implements Node<EthHealthIndicator> {
      */
     public Web3j getWeb3j() {
         return web3j;
+    }
+
+    /**
+     * Returns a {@link Web3jService}
+     */
+    public Web3jService getWeb3jService() {
+        return web3jService;
     }
 
     /**
