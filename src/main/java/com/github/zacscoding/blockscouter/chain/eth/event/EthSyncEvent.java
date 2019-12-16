@@ -14,26 +14,22 @@
  * limitations under the License.
  */
 
-package com.github.zacscoding.blockscouter.chain.eth;
+package com.github.zacscoding.blockscouter.chain.eth.event;
 
-import java.util.List;
-
-import org.web3j.protocol.core.methods.response.Transaction;
-
-import com.github.zacscoding.blockscouter.chain.eth.event.EthBestBlockResult;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Ethereum chain event listener
+ * Ethereum abstract sync event
  */
-public interface EthChainListener {
+public abstract class EthSyncEvent {
 
-    /**
-     * Listen to subscribe new blocks.
-     */
-    void onNewBlocks(EthChainConfig chainConfig, EthBestBlockResult result);
+    protected final EthSyncEventType eventType;
 
-    /**
-     * Listen to subscribe new pending transactions
-     */
-    void onPendingTransactions(EthChainConfig chainConfig, List<Transaction> pendingTransactions);
+    EthSyncEvent(EthSyncEventType eventType) {
+        this.eventType = checkNotNull(eventType, "eventType");
+    }
+
+    public EthSyncEventType getEventType() {
+        return eventType;
+    }
 }

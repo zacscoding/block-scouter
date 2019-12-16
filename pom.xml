@@ -6,7 +6,7 @@
 
   <groupId>com.github.zacscoding</groupId>
   <artifactId>block-scouter</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.1</version>
 
   <name>blockchain scouter</name>
   <description>subscribe blockchains events</description>
@@ -30,6 +30,13 @@
   <scm>
     <url>https://github.com/zacscoding/block-scouter</url>
   </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>block-scouter</id>
+      <url>https://api.bintray.com/maven/zacscoding/maven/block-scouter/;publish=1</url>
+    </repository>
+  </distributionManagement>
 
   <properties>
     <java.version>1.8</java.version>
@@ -108,13 +115,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
       <version>${slf4j.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>${slf4j.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
@@ -160,6 +165,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.1</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
@@ -170,7 +176,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.1</version>
+        <version>3.0.0-M3</version>
+        <configuration>
+          <excludes>
+            <exclude>com/github/zacscoding/blockscouter/dev/**/*.java</exclude>
+          </excludes>
+        </configuration>
       </plugin>
 
       <plugin>

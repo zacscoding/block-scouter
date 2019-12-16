@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-package com.github.zacscoding.blockscouter.chain.eth;
-
-import java.util.List;
-
-import org.web3j.protocol.core.methods.response.Transaction;
-
-import com.github.zacscoding.blockscouter.chain.eth.event.EthBestBlockResult;
+package com.github.zacscoding.blockscouter.chain.eth.event;
 
 /**
- * Ethereum chain event listener
  */
-public interface EthChainListener {
+public final class EthNewPeerEvent extends EthSyncEvent {
 
-    /**
-     * Listen to subscribe new blocks.
-     */
-    void onNewBlocks(EthChainConfig chainConfig, EthBestBlockResult result);
+    public static EthNewPeerEvent INSTANCE = new EthNewPeerEvent();
 
-    /**
-     * Listen to subscribe new pending transactions
-     */
-    void onPendingTransactions(EthChainConfig chainConfig, List<Transaction> pendingTransactions);
+    private EthNewPeerEvent() {
+        super(EthSyncEventType.NEW_PEER);
+    }
 }

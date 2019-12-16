@@ -42,7 +42,6 @@ import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.EthTransaction;
 import org.web3j.protocol.core.methods.response.Transaction;
 
-import com.github.zacscoding.blockscouter.chain.eth.EthBestBlockResult;
 import com.github.zacscoding.blockscouter.chain.eth.EthChainConfig;
 import com.github.zacscoding.blockscouter.chain.eth.EthChainListener;
 import com.github.zacscoding.blockscouter.node.eth.EthNode;

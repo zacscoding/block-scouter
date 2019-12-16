@@ -19,7 +19,12 @@ package com.github.zacscoding.blockscouter.chain.eth;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -27,7 +32,10 @@ import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.health.HealthCheck.Result;
 import com.github.zacscoding.blockscouter.chain.ChainManager;
+import com.github.zacscoding.blockscouter.chain.eth.event.EthNewPeerEvent;
 import com.github.zacscoding.blockscouter.chain.eth.event.EthPendingTransactionBatch;
+import com.github.zacscoding.blockscouter.chain.eth.event.EthSyncEvent;
+import com.github.zacscoding.blockscouter.chain.eth.event.EthSyncTask;
 import com.github.zacscoding.blockscouter.health.eth.EthHealthChecker;
 import com.github.zacscoding.blockscouter.health.eth.EthHealthIndicator;
 import com.github.zacscoding.blockscouter.node.eth.EthNode;
@@ -38,7 +46,7 @@ import com.github.zacscoding.blockscouter.sdk.eth.EthRpcServiceFactory;
 /**
  * Manage given ethereum nodes in the same chain
  */
-public class EthChainManager implements ChainManager<EthNodeConfig> {
+public class EthChainManager implements ChainManager<EthNode, EthNodeConfig> {
 
     private static final Logger logger = LoggerFactory.getLogger(EthChainManager.class);
 
@@ -52,6 +60,8 @@ public class EthChainManager implements ChainManager<EthNodeConfig> {
     // post constructed
     private String genesisHash;
     private EthHealthChecker healthChecker;
+    private LinkedBlockingQueue<EthSyncEvent> syncEventQueue;
+    private EthSyncTask syncTask;
     private EthPendingTransactionBatch pendingTransactionBatch;
 
     public EthChainManager(EthChainConfig chainConfig,
@@ -144,6 +154,29 @@ public class EthChainManager implements ChainManager<EthNodeConfig> {
         }
     }
 
+    @Override
+    public List<EthNode> getActiveNodes() {
+        final List<EthHealthIndicator> healthyIndicators = healthChecker.getHealthyIndicators();
+
+        if (healthyIndicators.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final List<EthNode> activeNodes = new ArrayList<>(healthyIndicators.size());
+
+        for (EthHealthIndicator healthyIndicator : healthyIndicators) {
+            Optional<EthNode> nodeOptional =
+                    nodeManager.getNode(chainConfig.getChainId(), healthyIndicator.getName());
+            if (!nodeOptional.isPresent()) {
+                continue;
+            }
+
+            activeNodes.add(nodeOptional.get());
+        }
+
+        return activeNodes;
+    }
+
     /**
      * Initialize a ethereum chain
      */
@@ -155,6 +188,14 @@ public class EthChainManager implements ChainManager<EthNodeConfig> {
         healthChecker = new EthHealthChecker();
         healthChecker.setHealthCheckListener(this::handleHealthStateChange);
         healthChecker.start(100L, chainConfig.getBlockTime());
+
+        // chain sync task
+        syncEventQueue = new LinkedBlockingQueue<EthSyncEvent>();
+        syncTask = new EthSyncTask(
+                chainConfig, chainReader, healthChecker, nodeManager,
+                chainListenerOptional, syncEventQueue, (long) (chainConfig.getBlockTime() * 1.5D)
+        );
+        syncTask.start();
 
         // pending transaction batch
         pendingTransactionBatch = new EthPendingTransactionBatch(chainConfig, chainListenerOptional);
@@ -175,14 +216,14 @@ public class EthChainManager implements ChainManager<EthNodeConfig> {
                 "Ethereum node health state is changed. name : {} / prev healthy : {} / current healthy: {}"
                 , indicator.getName(), prev.isHealthy(), current.isHealthy());
 
-        // 1) 노드에게 직접 알려줌
-        Optional<EthNode> node = nodeManager.getNode(chainConfig.getChainId(), indicator.getName());
+        // 1) notify health state changed to a node
+        final Optional<EthNode> node = nodeManager.getNode(chainConfig.getChainId(), indicator.getName());
 
         if (node.isPresent()) {
             node.get().onHealthStateChange(current);
         }
 
         // 2) publish new peer event
-        // eventQueue.offer();
+        syncEventQueue.offer(EthNewPeerEvent.INSTANCE);
     }
 }

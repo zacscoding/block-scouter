@@ -14,37 +14,20 @@
  * limitations under the License.
  */
 
-package com.github.zacscoding.blockscouter.chain;
-
-import java.util.List;
-
-import com.github.zacscoding.blockscouter.node.Node;
-import com.github.zacscoding.blockscouter.node.NodeConfig;
+package com.github.zacscoding.blockscouter.chain.eth.event;
 
 /**
- * Chain manager
+ * Ethereum sync event type
  */
-public interface ChainManager<N extends Node<?>, NC extends NodeConfig> {
+public enum EthSyncEventType {
 
     /**
-     * Returns a genesis hash in current chain
+     * Added a node or health status is changed (unhealthy -> healthy)
      */
-    String getGenesisHash();
+    NEW_PEER,
 
     /**
-     * Returns a chain id
+     * Force sync event
      */
-    String getChainId();
-
-    /**
-     * Adds a node
-     */
-    void addNode(NC nodeConfig);
-
-    /**
-     * Remove a node given node name
-     */
-    void removeNode(String name);
-
-    List<N> getActiveNodes();
+    FORCE_SYNC
 }

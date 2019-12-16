@@ -23,7 +23,7 @@ import com.github.zacscoding.blockscouter.health.eth.EthHealthIndicatorType.EthC
 /**
  * Ethereum node config builder
  */
-public final class EthNodeBuilder {
+public final class EthNodeConfigBuilder {
 
     private String chainId = Defaults.CHAIN_ID;
 
@@ -41,25 +41,25 @@ public final class EthNodeBuilder {
 
     private EthHealthIndicatorType healthIndicatorType = Defaults.HEALTH_INDICATOR_TYPE;
 
-    public static EthNodeBuilder builder(String name) {
-        return new EthNodeBuilder(name);
+    public static EthNodeConfigBuilder builder(String name) {
+        return new EthNodeConfigBuilder(name);
     }
 
-    private EthNodeBuilder(String name) {
+    private EthNodeConfigBuilder(String name) {
         this.name = checkNotNull(name, name);
     }
 
-    public EthNodeBuilder chainId(String chainId) {
+    public EthNodeConfigBuilder chainId(String chainId) {
         this.chainId = checkNotNull(chainId, "chainId");
         return this;
     }
 
-    public EthNodeBuilder rpcUrl(String rpcUrl) {
+    public EthNodeConfigBuilder rpcUrl(String rpcUrl) {
         this.rpcUrl = checkNotNull(rpcUrl, "rpcUrl");
         return this;
     }
 
-    public EthNodeBuilder blockTime(long blockTime) {
+    public EthNodeConfigBuilder blockTime(long blockTime) {
         if (blockTime <= 1000L) {
             throw new IllegalStateException("Block time must be greater than or equals to 1000L");
         }
@@ -68,18 +68,18 @@ public final class EthNodeBuilder {
         return this;
     }
 
-    public EthNodeBuilder subscribeNewBlock(boolean subscribeNewBlock) {
+    public EthNodeConfigBuilder subscribeNewBlock(boolean subscribeNewBlock) {
         this.subscribeNewBlock = checkNotNull(subscribeNewBlock, "subscribeNewBlock");
         return this;
     }
 
-    public EthNodeBuilder subscribePendingTransaction(boolean subscribePendingTransaction) {
+    public EthNodeConfigBuilder subscribePendingTransaction(boolean subscribePendingTransaction) {
         this.subscribePendingTransaction = checkNotNull(subscribePendingTransaction,
                                                         "subscribePendingTransaction");
         return this;
     }
 
-    public EthNodeBuilder pendingTransactionPollingInterval(long pendingTransactionPollingInterval) {
+    public EthNodeConfigBuilder pendingTransactionPollingInterval(long pendingTransactionPollingInterval) {
         if (blockTime <= 0) {
             throw new IllegalStateException("Block time must be greater than or equals to 0L");
         }
@@ -89,7 +89,7 @@ public final class EthNodeBuilder {
         return this;
     }
 
-    public EthNodeBuilder healthIndicatorType(EthHealthIndicatorType healthIndicatorType) {
+    public EthNodeConfigBuilder healthIndicatorType(EthHealthIndicatorType healthIndicatorType) {
         this.healthIndicatorType = checkNotNull(healthIndicatorType, "healthIndicatorType");
 
         return this;

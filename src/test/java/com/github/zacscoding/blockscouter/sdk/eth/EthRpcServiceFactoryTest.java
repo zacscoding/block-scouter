@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.ipc.IpcService;
+import org.web3j.protocol.websocket.WebSocketService;
 
 import com.github.zacscoding.blockscouter.exception.SDKCreateException;
 import com.github.zacscoding.blockscouter.node.eth.EthNode;
@@ -59,7 +60,7 @@ public class EthRpcServiceFactoryTest {
 
     @Test
     @DisplayName("create http service if http url is provided")
-    public void createCaymFromHttpService() throws Exception {
+    public void createWeb3jFromHttpService() throws Exception {
         // given
         when(node.getRpcUrl()).thenReturn("http://localhost:8545");
 
@@ -73,13 +74,15 @@ public class EthRpcServiceFactoryTest {
 
     @Test
     @DisplayName("create ws service if ws url is provided and then throw connection exception")
-    public void createCaymFromWebsocketService() throws Exception {
+    public void createWeb3jFromWebsocketService() throws Exception {
         // given
         when(node.getRpcUrl()).thenReturn("ws://localhost:1");
 
-        // when then
-        assertThatThrownBy(() -> rpcServiceFactory.createWeb3j(node))
-                .isInstanceOf(SDKCreateException.class)
-                .hasCauseInstanceOf(ConnectException.class);
+        // when
+        final Web3j web3j = rpcServiceFactory.createWeb3j(node);
+
+        // then
+        assertThat(web3j.getWeb3jService()).isNotNull();
+        assertThat(web3j.getWeb3jService() instanceof WebSocketService).isTrue();
     }
 }

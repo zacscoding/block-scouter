@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package com.github.zacscoding.blockscouter.chain.eth;
+package com.github.zacscoding.blockscouter.chain.eth.event;
 
 /**
+ * Ethereum force sync event
  */
-public class EthBestBlockResult {
+public final class EthForceSyncEvent extends EthSyncEvent {
+
+    public static final EthForceSyncEvent INSTANCE = new EthForceSyncEvent();
+
+    private EthForceSyncEvent() {
+        super(EthSyncEventType.FORCE_SYNC);
+    }
 }
