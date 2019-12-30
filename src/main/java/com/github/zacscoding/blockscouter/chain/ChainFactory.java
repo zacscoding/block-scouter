@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 
-package com.github.zacscoding.blockscouter.chain.eth;
+package com.github.zacscoding.blockscouter.chain;
 
 import java.util.List;
-
-import org.web3j.protocol.core.methods.response.Transaction;
-
-import com.github.zacscoding.blockscouter.chain.eth.event.EthBestBlockResult;
+import java.util.Optional;
 
 /**
- * Ethereum chain event listener
+ * Factory of block chains
  */
-public interface EthChainListener {
+public interface ChainFactory<T> {
 
     /**
-     * Listen to subscribe new blocks.
+     * Returns all chain id
      */
-    void onNewBlocks(EthChainConfig chainConfig, EthBestBlockResult result);
+    List<String> getChainIds();
 
     /**
-     * Listen to subscribe new pending transactions
+     * Returns whether contains or not given chain id
      */
-    void onPendingTransactions(EthChainConfig chainConfig, List<Transaction> pendingTransactions);
+    boolean contains(String chainId);
 
     /**
-     * Listen to added this chain at first
+     * Returns a {@link T} chain manager given chain id or empty
      */
-    void prepareNewChain(EthChainConfig chainConfig);
+    Optional<T> getChainManager(String chainId);
 }

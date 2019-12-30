@@ -101,6 +101,11 @@ public class PendingTransactionBatchTest {
                 assertThat(pendingTransactions.size()).isEqualTo(hashes.size());
                 countDownLatch.countDown();
             }
+
+            @Override
+            public void prepareNewChain(EthChainConfig chainConfig) {
+
+            }
         };
 
         final EthPendingTransactionBatch batch =
@@ -145,6 +150,11 @@ public class PendingTransactionBatchTest {
                 }
                 assertThat(pendingTransactions.size()).isEqualTo(hashes.size());
                 countDownLatch.countDown();
+            }
+
+            @Override
+            public void prepareNewChain(EthChainConfig chainConfig) {
+
             }
         };
 

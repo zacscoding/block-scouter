@@ -61,11 +61,11 @@ public class ChainManagerConsoleTest {
     @BeforeEach
     public void setUp() {
         final EthChainConfig chainConfig = EthChainConfigBuilder.builder()
-                                           .chainId("36435")
-                                           .blockTime(5000L)
-                                           .pendingTransactionBatchMaxSize(3)
-                                           .pendingTransactionBatchMaxSeconds(5)
-                                           .build();
+                                                                .chainId("36435")
+                                                                .blockTime(5000L)
+                                                                .pendingTransactionBatchMaxSize(3)
+                                                                .pendingTransactionBatchMaxSeconds(5)
+                                                                .build();
 
         nodeManager = new EthNodeManager();
         chainReader = new EthChainReader() {
@@ -111,6 +111,11 @@ public class ChainManagerConsoleTest {
                 }
 
                 System.out.println(builder);
+            }
+
+            @Override
+            public void prepareNewChain(EthChainConfig chainConfig) {
+
             }
         };
 
