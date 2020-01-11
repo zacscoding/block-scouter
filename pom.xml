@@ -7,7 +7,10 @@
   <groupId>com.github.zacscoding</groupId>
   <artifactId>block-scouter</artifactId>
   <version>0.2-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <modules>
+    <module>core</module>
+  </modules>
+  <packaging>pom</packaging>
 
   <name>blockchain scouter</name>
   <description>subscribe blockchains events</description>
@@ -42,125 +45,7 @@
   <properties>
     <java.version>1.8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <!-- loggin properties -->
-    <slf4j.version>1.7.25</slf4j.version>
-    <log4j.version>2.11.0</log4j.version>
-
-    <!-- project reactor -->
-    <reactor.version>3.2.5.RELEASE</reactor.version>
-
-    <!-- metrics version -->
-    <metrics.version>4.1.0</metrics.version>
-
-    <!-- web3j version -->
-    <web3j.version>4.5.10</web3j.version>
-
-    <!-- test properties -->
-    <mockito.version>3.1.0</mockito.version>
-    <junit.version>5.5.2</junit.version>
   </properties>
-
-  <dependencies>
-    <!-- web3j -->
-    <dependency>
-      <groupId>org.web3j</groupId>
-      <artifactId>core</artifactId>
-      <version>${web3j.version}</version>
-    </dependency>
-
-    <!-- projectreactor -->
-    <dependency>
-      <groupId>io.projectreactor</groupId>
-      <artifactId>reactor-core</artifactId>
-      <version>${reactor.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.projectreactor</groupId>
-      <artifactId>reactor-test</artifactId>
-      <version>${reactor.version}</version>
-    </dependency>
-
-    <!-- dropwizard metrics -->
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-healthchecks</artifactId>
-      <version>${metrics.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-core</artifactId>
-      <version>${metrics.version}</version>
-    </dependency>
-
-    <!-- guava -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>28.1-jre</version>
-    </dependency>
-
-    <!-- apache common lang3 -->
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.9</version>
-    </dependency>
-
-    <!-- logging -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>${log4j.version}</version>
-    </dependency>
-
-    <!-- test -->
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
-      <version>${mockito.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>${mockito.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <version>3.13.2</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 
   <build>
     <plugins>
@@ -186,7 +71,7 @@
         <version>3.0.0-M3</version>
         <configuration>
           <excludes>
-            <exclude>com/github/zacscoding/blockscouter/dev/**/*.java</exclude>
+            <exclude>blockscouter/core/dev/**/*.java</exclude>
           </excludes>
         </configuration>
       </plugin>
