@@ -103,7 +103,6 @@ public class ChainManagerConsoleTest {
 
             @Override
             public void prepareNewChain(EthChainConfig chainConfig) {
-
             }
         };
 

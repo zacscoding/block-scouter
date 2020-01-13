@@ -1,5 +1,19 @@
-# Block scouter
-; Subscribe block chain events such as ethereum.
+# Block scouter  
+`Block scouter` is a library for managing blockchain clients.  
+
+## Features
+
+- Ethereum  
+  - [x] manage nodes  
+    - (un)subscribe new block, pending transaction  
+    - check healthy or not depends on health check type  
+  - [x] manage a chain      
+    - listen to block event  
+      - new block event  
+      - pending transaction buffer
+    - provide load balanced web3j proxy  
+
+---  
 
 > ## Getting started
 
@@ -36,99 +50,143 @@ repositories {
 
 compile 'com.github.zacscoding:block-scouter:0.1'
 
-``` 
-
-> ## Building a ethereum chain  
-[See](src/test/java/com/github/zacscoding/blockscouter/dev/ChainManagerConsoleTest.java)
-
-- manage ethereum's node 
-- manage healthy/unhealthy node
-- provide Web3jService proxy from active nodes
-- listen new block event 
-- listen pending transaction buffer
-
-> chain config
-
-```
-final EthChainConfig chainConfig = EthChainConfigBuilder.builder()
-                                           .chainId("36435") // ethereum chain id
-                                           .blockTime(5000L) // average block time
-                                           .pendingTransactionBatchMaxSize(3) // pending tx batch max size
-                                           .pendingTransactionBatchMaxSeconds(5) // pending tx batch max timeout
-                                           .build();
 ```  
 
-> node manager
+---  
 
-```
-final EthNodeManager nodeManager = new EthNodeManager();
-```
+## Usage of ethereum chain  
 
-> rpc service factory
+<a href="core/src/test/java/blockscouter/core/dev/EthChainUsageTest.java">See example code</a>  
 
-```
-final EthRpcServiceFactory rpcServiceFactory = new DefaultEthRpcServiceFactory();
-``` 
+> ### Build a EthChainManager  
 
-> build a node
+```java
+@Test
+public void runTests() throws Exception {
+    // build a ethereum chain config
+    EthChainConfig chainConfig = EthChainConfigBuilder.builder()
+                                                      // ethereum's chain id
+                                                      .chainId("36435")
+                                                      // average block time
+                                                      .blockTime(5000L)
+                                                      // pending tx buffer max size
+                                                      .pendingTransactionBatchMaxSize(3)
+                                                      // pending tx buffer max seconds
+                                                      .pendingTransactionBatchMaxSeconds(5)
+                                                      .build();
 
-```aidl
-node1 = EthNodeConfigBuilder.builder("node1")
-                                    .blockTime(5000L)
-                                    .chainId(chainConfig.getChainId())
-                                    .healthIndicatorType(EthConnectedOnly.INSTANCE)
-                                    .pendingTransactionPollingInterval(1000L)
-                                    .rpcUrl("http://localhost:8545")
-                                    .subscribeNewBlock(false)
-                                    .subscribePendingTransaction(true)
-                                    .build();
-```
+    // in-memory node manage (add,delete nodes)
+    EthNodeManager nodeManager = new EthNodeManager();
 
-> build a ethereum chain
+    // ethereum rpc service factory (i.e create a web3jservice given protocol)
+    EthRpcServiceFactory rpcServiceFactory = new DefaultEthRpcServiceFactory();
 
-```
-final EthChainManager chainManager = new EthChainManager(chainConfig,
-                                                         nodeManager,
-                                                         chainReader,
-                                                         chainListener,
-                                                         rpcServiceFactory);
+    // build ethereum node1, node2
+    EthNodeConfig node1Config = EthNodeConfigBuilder.builder("node1") // node name
+                                                    // average block time
+                                                    .blockTime(chainConfig.getBlockTime())
+                                                    // chain id
+                                                    .chainId(chainConfig.getChainId())
+                                                    // health check type
+                                                    .healthIndicatorType(EthConnectedOnly.INSTANCE)
+                                                    // pending transaction polling interval(ms)
+                                                    .pendingTransactionPollingInterval(1000L)
+                                                    // rpc url (use http protocol)
+                                                    .rpcUrl("http://localhost:8545")
+                                                    // subscribe a new block or not
+                                                    // if true, create a block stream
+                                                    .subscribeNewBlock(false)
+                                                    // subscribe pending transaction
+                                                    // if true, create a transaction stream and
+                                                    // collect distinct pending tx hash from EthChainManager
+                                                    .subscribePendingTransaction(true)
+                                                    .build();
 
-chainManager.addNode(node1, false);
-```
+    EthNodeConfig node2Config = EthNodeConfigBuilder.builder("node2")
+                                                    .blockTime(chainConfig.getBlockTime())
+                                                    .chainId(chainConfig.getChainId())
+                                                    .healthIndicatorType(EthSynchronized.INSTANCE)
+                                                    .pendingTransactionPollingInterval(1000L)
+                                                    // rpc url (use websocket protocol)
+                                                    .rpcUrl("ws://localhost:9546")
+                                                    .subscribeNewBlock(false)
+                                                    .subscribePendingTransaction(true)
+                                                    .build();
 
-> Provide chain reader & chain listener
+    EthChainListener chainListener = new EthChainListener() {
+        @Override
+        public void onNewBlocks(EthChainConfig chainConfig, EthBestBlockResult result) {
+            // new blocks event occur if below conditions satisfied
+            // => determine a best block from nodes by comparing total difficulty
+            // 1) after force sync timeout(blockTime * 1.5)            
+            // 2) adds a new node or changed to healthy state(unhealthy -> healthy)
+        }
 
-> EthChainReader
+        @Override
+        public void onPendingTransactions(EthChainConfig chainConfig,
+                                          List<Transaction> pendingTransactions) {
+            // pending transaction batch occur if below conditions satisfied.
+            // 1) after 5s(== max time seconds of a chain config's pending tx batch)
+            // 2) collected 3 pending transactions(== max size of a chain config's pending tx max size)
+        }
 
-```
-public interface EthChainReader {
+        @Override
+        public void prepareNewChain(EthChainConfig chainConfig) {
+            // if create a new EthChainManager, this method is called only one time at first.
+        }
+    };
 
-    /**
-     * Returns a total difficulty given chain id
-     */
-    BigInteger getTotalDifficulty(String chainId);
+    // Create a new chain manager
+    EthChainManager chainManager = new EthChainManager(chainConfig, nodeManager,
+                                                       chainListener, rpcServiceFactory);
 
-    /**
-     * Returns a block hash given chain id and block number
-     */
-    String getBlockHashByNumber(String chainId, Long blockNumber);
+    // Adds node1, node2
+    chainManager.addNode(node1Config, false);
+    chainManager.addNode(node2Config, false);    
 }
-```
+```  
 
-> EthChainListener
+> ### Use load balanced ethereum client i.e Web3jService  
 
-```
-public interface EthChainListener {
+```java
+@Test
+public void runTests() throws Exception {
+    ...
+    // Returns a load balanced web3jservice proxy
+    Web3jService web3jService = chainManager.getLoadBalancedWeb3jService();
+    Web3j web3j = Web3j.build(web3jService);
 
-    /**
-     * Listen to subscribe new blocks.
-     */
-    void onNewBlocks(EthChainConfig chainConfig, EthBestBlockResult result);
-
-    /**
-     * Listen to subscribe new pending transactions
-     */
-    void onPendingTransactions(EthChainConfig chainConfig, List<Transaction> pendingTransactions);
+    // choose node1
+    String node1ClientVersion = web3j.web3ClientVersion().send().getWeb3ClientVersion();
+    // choose node2
+    String node2ClientVersion = web3j.web3ClientVersion().send().getWeb3ClientVersion();
 }
-```
+```  
 
+> #### Use block download  
+
+```java
+@Test
+public void runTests() throws Exception {    
+    ...
+
+    /**
+     * Download blocks from 0 to 10 i.e [0,10] with load balanced requests    
+     */
+    // Try to request getBlockByNumber(X) by load balanced Web3jService
+    // EthDownloadBlock contains a block with transactions, transaction receipts in this block
+    Flowable<EthDownloadBlock> ethDownloadBlockFlowable = downloader.downloadBlocks(0L, 10L);
+    Disposable subscription =
+        ethDownloadBlockFlowable.subscribe(
+            result -> {
+                Block block = result.getBlock();
+                for (TransactionResult transaction : block.getTransactions()) {
+                    Transaction tx = (Transaction) transaction;
+                    TransactionReceipt tr = result.getReceiptMap().get(tx.getHash());
+                }
+            },
+            throwable -> throwable.printStackTrace(System.err),
+            () -> System.out.println("onComplete to download"));
+    ...
+}
+```  
