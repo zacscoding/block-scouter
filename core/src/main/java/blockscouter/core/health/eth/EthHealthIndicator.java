@@ -62,10 +62,15 @@ public class EthHealthIndicator extends HealthIndicator {
     /**
      * Returns alive or not of {@link EthNode} in this indicator
      */
-    public boolean isAlive() {
-        synchronized (this) {
-            return healthy.isHealthy();
-        }
+    public synchronized boolean isAlive() {
+        return healthy.isHealthy();
+    }
+
+    /**
+     * Returns a {@link EthNode}
+     */
+    public EthNode getNode() {
+        return node;
     }
 
     private Result checkInternal() {

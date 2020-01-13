@@ -48,12 +48,10 @@ import blockscouter.core.node.eth.EthNodeManager;
 public class EthSyncTask extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(EthSyncTask.class);
-
     private static final long MINIMUM_FORCE_SYNC = 1000L;
 
     // required
     private final EthChainConfig chainConfig;
-    private final EthChainReader chainReader;
     private final EthHealthChecker healthChecker;
     private final EthNodeManager nodeManager;
     private final Optional<EthChainListener> chainListenerOptional;
@@ -63,9 +61,9 @@ public class EthSyncTask extends Thread {
     // fields
     private final Object syncLock = new Object();
     private boolean syncing = false;
+    private BigInteger totalDifficulty = BigInteger.ZERO;
 
     public EthSyncTask(EthChainConfig chainConfig,
-                       EthChainReader chainReader,
                        EthHealthChecker healthChecker,
                        EthNodeManager nodeManager,
                        Optional<EthChainListener> chainListenerOptional,
@@ -73,7 +71,6 @@ public class EthSyncTask extends Thread {
                        long forceSyncTimeout) {
 
         this.chainConfig = checkNotNull(chainConfig, "chainConfig");
-        this.chainReader = checkNotNull(chainReader, "chainReader");
         this.healthChecker = checkNotNull(healthChecker, "healthChecker");
         this.nodeManager = checkNotNull(nodeManager, "nodeManager");
         this.chainListenerOptional = checkNotNull(chainListenerOptional, "chainListenerOptional");
@@ -209,12 +206,13 @@ public class EthSyncTask extends Thread {
             }
         }
 
-        // compare chain with provided chain reader
-        if (chainReader.getTotalDifficulty(chainConfig.getChainId()).compareTo(
-                bestBlockResult.getTotalDifficulty()) >= 0) {
+        // compare total difficulty
+        if (totalDifficulty.compareTo(bestBlockResult.getTotalDifficulty()) >= 0) {
             logger.debug("skip to synchronize because before total difficulty is greater");
             return;
         }
+
+        totalDifficulty = bestBlockResult.getTotalDifficulty();
 
         if (chainListenerOptional.isPresent()) {
             chainListenerOptional.get().onNewBlocks(chainConfig, bestBlockResult);

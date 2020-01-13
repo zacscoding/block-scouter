@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-/**
- */
 public class DefaultNodeManager<N extends Node> implements NodeManager<N> {
 
     private final Map<String, Map<String, N>> nodesByChainId;
@@ -113,6 +111,18 @@ public class DefaultNodeManager<N extends Node> implements NodeManager<N> {
             return Optional.ofNullable(nodes.get(name));
         } finally {
             lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public void shutdown() {
+        for (Map<String, N> entry : nodesByChainId.values()) {
+            for (N value : entry.values()) {
+                try {
+                    value.destroy();
+                } catch (Exception ignored) {
+                }
+            }
         }
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package blockscouter.core.eth.download;
+package blockscouter.core.chain.eth.download;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

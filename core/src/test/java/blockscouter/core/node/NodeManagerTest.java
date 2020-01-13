@@ -196,5 +196,10 @@ public class NodeManagerTest {
                 destroyLatch.countDown();
             }
         }
+
+        @Override
+        public boolean isAlive() {
+            return true;
+        }
     }
 }

@@ -53,4 +53,9 @@ public interface NodeManager<N extends Node> {
      * Returns a {@link Node} given chain id and node name
      */
     Optional<N> getNode(String chainId, String name);
+
+    /**
+     * Shutdown this node manager
+     */
+    void shutdown();
 }

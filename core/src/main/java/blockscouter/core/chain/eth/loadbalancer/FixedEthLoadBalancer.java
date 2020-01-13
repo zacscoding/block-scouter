@@ -35,17 +35,17 @@ public class FixedEthLoadBalancer extends AbstractEthLoadBalancer {
     }
 
     @Override
-    protected List<EthNode> getAvailableEthNodes() {
+    protected List<EthNode> getAvailableEthNodes(Object key) {
         return nodes;
     }
 
     @Override
-    protected List<EthNode> getAllEthNodes() {
+    protected List<EthNode> getAllEthNodes(Object key) {
         return nodes;
     }
 
     @Override
-    protected AtomicInteger getNextServerCounter() {
+    protected AtomicInteger getNextServerCounter(Object key) {
         return nextServerCounter;
     }
 }

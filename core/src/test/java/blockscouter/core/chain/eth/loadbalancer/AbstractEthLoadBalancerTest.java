@@ -14,40 +14,11 @@
  * limitations under the License.
  */
 
-package blockscouter.core.chain;
-
-import java.util.List;
-
-import blockscouter.core.node.Node;
-import blockscouter.core.node.NodeConfig;
+package blockscouter.core.chain.eth.loadbalancer;
 
 /**
- * Chain manager
+ *  TODO
  */
-public interface ChainManager<N extends Node<?>, NC extends NodeConfig> {
+public class AbstractEthLoadBalancerTest {
 
-    /**
-     * Returns a chain id
-     */
-    String getChainId();
-
-    /**
-     * Adds a node
-     */
-    void addNode(NC nodeConfig);
-
-    /**
-     * Remove a node given node name
-     */
-    void removeNode(String name);
-
-    /**
-     * Return active nodes i.e healthy in chain
-     */
-    List<N> getActiveNodes();
-
-    /**
-     * Shutdown this chain manager
-     */
-    void shutdown();
 }

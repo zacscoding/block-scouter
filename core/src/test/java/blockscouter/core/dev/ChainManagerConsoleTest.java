@@ -16,7 +16,6 @@
 
 package blockscouter.core.dev;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -25,6 +24,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
 import org.web3j.protocol.core.methods.response.Transaction;
 
@@ -32,7 +33,6 @@ import blockscouter.core.chain.eth.EthChainConfig;
 import blockscouter.core.chain.eth.EthChainConfigBuilder;
 import blockscouter.core.chain.eth.EthChainListener;
 import blockscouter.core.chain.eth.EthChainManager;
-import blockscouter.core.chain.eth.EthChainReader;
 import blockscouter.core.chain.eth.event.EthBestBlockResult;
 import blockscouter.core.health.eth.EthHealthIndicatorType.EthConnectedOnly;
 import blockscouter.core.health.eth.EthHealthIndicatorType.EthSynchronized;
@@ -51,7 +51,6 @@ public class ChainManagerConsoleTest {
 
     EthChainConfig chainConfig;
     EthNodeManager nodeManager;
-    EthChainReader chainReader;
     EthChainListener chainListener;
     EthRpcServiceFactory rpcServiceFactory;
 
@@ -68,17 +67,6 @@ public class ChainManagerConsoleTest {
                                            .build();
 
         nodeManager = new EthNodeManager();
-        chainReader = new EthChainReader() {
-            @Override
-            public BigInteger getTotalDifficulty(String chainId) {
-                return BigInteger.ZERO;
-            }
-
-            @Override
-            public String getBlockHashByNumber(String chainId, Long blockNumber) {
-                return null;
-            }
-        };
         chainListener = new EthChainListener() {
             @Override
             public void onNewBlocks(EthChainConfig chainConfig, EthBestBlockResult result) {
@@ -143,11 +131,29 @@ public class ChainManagerConsoleTest {
     }
 
     @Test
+    public void getLoadBalancer() throws Exception {
+        final EthChainManager chainManager = new EthChainManager(chainConfig,
+                                                                 nodeManager,
+                                                                 chainListener,
+                                                                 rpcServiceFactory);
+
+        chainManager.addNode(node1, false);
+        chainManager.addNode(node2, false);
+
+        Web3jService web3jService = chainManager.getLoadBalancedWeb3jService();
+        Web3j web3j = Web3j.build(web3jService);
+
+        for (int i = 0; i < 50; i++) {
+            System.out.println("## Check syncing >> " + web3j.ethSyncing().send().isSyncing());
+            TimeUnit.SECONDS.sleep(3L);
+        }
+    }
+
+    @Test
     @DisplayName("listen events")
     public void start() throws Exception {
         final EthChainManager chainManager = new EthChainManager(chainConfig,
                                                                  nodeManager,
-                                                                 chainReader,
                                                                  chainListener,
                                                                  rpcServiceFactory);
 

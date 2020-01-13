@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package blockscouter.core.eth.event;
+package blockscouter.core.chain.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;

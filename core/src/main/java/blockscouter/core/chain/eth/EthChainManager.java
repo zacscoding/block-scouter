@@ -28,12 +28,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.web3j.protocol.Web3jService;
 
 import com.codahale.metrics.health.HealthCheck.Result;
 
 import blockscouter.core.chain.ChainManager;
 import blockscouter.core.chain.eth.event.EthNewPeerEvent;
 import blockscouter.core.chain.eth.event.EthSyncEvent;
+import blockscouter.core.chain.eth.loadbalancer.EthLoadBalancer;
 import blockscouter.core.health.eth.EthHealthChecker;
 import blockscouter.core.health.eth.EthHealthIndicator;
 import blockscouter.core.node.eth.EthNode;
@@ -51,12 +53,11 @@ public class EthChainManager implements ChainManager<EthNode, EthNodeConfig> {
     // required
     private final EthChainConfig chainConfig;
     private final EthNodeManager nodeManager;
-    private final EthChainReader chainReader;
     private final Optional<EthChainListener> chainListenerOptional;
     private final EthRpcServiceFactory rpcServiceFactory;
 
     // post constructed
-    private String genesisHash;
+    private EthLoadBalancer loadBalancer;
     private EthHealthChecker healthChecker;
     private LinkedBlockingQueue<EthSyncEvent> syncEventQueue;
     private EthSyncTask syncTask;
@@ -64,30 +65,15 @@ public class EthChainManager implements ChainManager<EthNode, EthNodeConfig> {
 
     public EthChainManager(EthChainConfig chainConfig,
                            EthNodeManager nodeManager,
-                           EthChainReader chainReader,
                            EthChainListener chainListener,
                            EthRpcServiceFactory rpcServiceFactory) {
 
         this.chainConfig = checkNotNull(chainConfig, "chainConfig");
         this.nodeManager = checkNotNull(nodeManager, "nodeManager");
-        this.chainReader = checkNotNull(chainReader, "chainReader");
         chainListenerOptional = Optional.ofNullable(chainListener);
         this.rpcServiceFactory = checkNotNull(rpcServiceFactory, "rpcServiceFactory");
 
         initialize();
-    }
-
-    @Override
-    public String getGenesisHash() {
-        if (genesisHash == null) {
-            try {
-                genesisHash = chainReader.getBlockHashByNumber(chainConfig.getChainId(), 0L);
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-
-        return genesisHash;
     }
 
     @Override
@@ -176,21 +162,39 @@ public class EthChainManager implements ChainManager<EthNode, EthNodeConfig> {
     }
 
     /**
+     * Returns a load balanced {@link Web3jService} proxy
+     */
+    public Web3jService getLoadBalancedWeb3jService() {
+        return loadBalancer.getLoadBalancedWeb3jService();
+    }
+
+    @Override
+    public void shutdown() {
+        try {
+            if (nodeManager != null) {
+                nodeManager.shutdown();
+            }
+        } catch (Exception ignored) {
+            // ignored
+        }
+    }
+
+    /**
      * Initialize a ethereum chain
      */
     private void initialize() {
-        // genesis hash
-        getGenesisHash();
-
         // start to health checker
         healthChecker = new EthHealthChecker();
         healthChecker.setHealthCheckListener(this::handleHealthStateChange);
         healthChecker.start(100L, chainConfig.getBlockTime());
 
+        // loadbalancer
+        loadBalancer = new EthLoadBalancer(healthChecker);
+
         // chain sync task
         syncEventQueue = new LinkedBlockingQueue<>();
         syncTask = new EthSyncTask(
-                chainConfig, chainReader, healthChecker, nodeManager,
+                chainConfig, healthChecker, nodeManager,
                 chainListenerOptional, syncEventQueue, (long) (chainConfig.getBlockTime() * 1.5D)
         );
         syncTask.start();
@@ -203,7 +207,6 @@ public class EthChainManager implements ChainManager<EthNode, EthNodeConfig> {
         final String logging = "\n// ====================================================\n"
                                + "Initialize ethereum chain.\n"
                                + "> chain config : " + chainConfig + '\n'
-                               + "> genesis hash : " + genesisHash + '\n'
                                + "==================================================== //";
         logger.debug(logging);
     }

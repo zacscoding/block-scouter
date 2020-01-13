@@ -40,12 +40,16 @@ public abstract class AbstractEthLoadBalancer {
     private static final int RETRY_COUNT = 3;
 
     public Web3jService getLoadBalancedWeb3jService() {
+        return getLoadBalancedWeb3jService(null);
+    }
+
+    public Web3jService getLoadBalancedWeb3jService(final Object key) {
         return Reflection.newProxy(Web3jService.class, (proxy, method, args) -> {
             Throwable exception = null;
 
             for (int i = 0; i < RETRY_COUNT; i++) {
                 try {
-                    EthNode node = chooseNode();
+                    final EthNode node = chooseNode(key);
 
                     if (node == null) {
                         if (exception == null) {
@@ -68,26 +72,26 @@ public abstract class AbstractEthLoadBalancer {
         });
     }
 
-    protected abstract List<EthNode> getAvailableEthNodes();
+    protected abstract List<EthNode> getAvailableEthNodes(Object key);
 
-    protected abstract List<EthNode> getAllEthNodes();
+    protected abstract List<EthNode> getAllEthNodes(Object key);
 
-    protected abstract AtomicInteger getNextServerCounter();
+    protected abstract AtomicInteger getNextServerCounter(Object key);
 
-    private EthNode chooseNode() {
+    private EthNode chooseNode(final Object key) {
         EthNode node;
-        AtomicInteger counter = getNextServerCounter();
+        final AtomicInteger counter = getNextServerCounter(key);
 
         int count = 0;
         while (count++ < 10) {
-            List<EthNode> nodes = getAllEthNodes();
+            final List<EthNode> nodes = getAllEthNodes(key);
 
             if (nodes.isEmpty()) {
                 logger.warn("No nodes from load balancer");
                 return null;
             }
 
-            if (getAvailableEthNodes().isEmpty()) {
+            if (getAvailableEthNodes(key).isEmpty()) {
                 final String nodeNames = nodes
                         .stream()
                         .map(EthNode::getNodeName)
@@ -102,6 +106,8 @@ public abstract class AbstractEthLoadBalancer {
             node = nodes.get(nextServerIndex);
 
             if (node.getHealthIndicator().isAlive()) {
+                System.out.println(">> Choose  ==> " + node);
+                logger.debug("Choose {}", node);
                 return node;
             }
         }
@@ -110,7 +116,7 @@ public abstract class AbstractEthLoadBalancer {
         return null;
     }
 
-    private int incrementAndGetModulo(AtomicInteger nextServerCyclicCounter, int modulo) {
+    private static int incrementAndGetModulo(AtomicInteger nextServerCyclicCounter, int modulo) {
         while (true) {
             int current = nextServerCyclicCounter.get();
             int next = (current + 1) % modulo;

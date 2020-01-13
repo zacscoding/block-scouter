@@ -27,6 +27,7 @@ import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
 import com.codahale.metrics.health.HealthCheck.Result;
+import com.google.common.base.MoreObjects;
 
 import blockscouter.core.health.eth.EthHealthIndicator;
 import blockscouter.core.node.Node;
@@ -225,5 +226,15 @@ public class EthNode implements Node<EthHealthIndicator> {
         if (!initialized) {
             throw new IllegalStateException(errorMessage);
         }
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("nodeConfig", nodeConfig)
+                          .add("web3jService", web3jService)
+                          .add("nodeObserver", nodeObserver)
+                          .add("healthIndicator", healthIndicator)
+                          .toString();
     }
 }
