@@ -17,18 +17,18 @@
 
 ## Modules  
 
-- **core** : block scouter core module  
-- **spring-boot-starter** : spring boot auto configure for block-scouter
+- **block-scouter-core** : block scouter core module  
+- **block-scouter-spring-boot-starter** : spring boot auto configure for block-scouter
 - **block-scouter-api** : block scouter api server example(support searching blockchain data)  
 
 ---  
 
 > ## Getting started
 
-**maven**  
+**Adds repository**  
 
 ```aidl
-
+// maven
 <repositories>
   <repository>
     <id>jcenter</id>
@@ -36,29 +36,25 @@
   </repository>
 </repositories>
 
-...
+// gradle
+repositories {
+  jecenter()
+}
+```  
 
-
-<dependency>
-	<groupId>block-scouter</groupId>
-	<artifactId>core</artifactId>
-	<version>0.2</version>
-</dependency>
-```
-
-**gradle**  
+**Adds dependency**  
 
 ```aidl
+// maven
+<dependency>
+  <groupId>com.github.zacscoding</groupId>
+  <artifactId>block-scouter-core</artifactId>
+  <version>0.2.1</version>
+</dependency>  
 
-repositories {
-    jecenter()
-}
-
-...
-
-implementation 'block-scouter:core:0.2'
-
-```
+// gradle
+implementation 'com.github.zacscoding:block-scouter-core:0.2.1'
+```  
 
 ---  
 
@@ -66,7 +62,7 @@ implementation 'block-scouter:core:0.2'
 
 <a href="core/src/test/java/blockscouter/block-scouter-core/dev/EthChainUsageTest.java">See example code</a>  
 
-> ### Build a EthChainManager  
+> #### Build a EthChainManager  
 
 ```java
 @Test
@@ -154,7 +150,7 @@ public void runTests() throws Exception {
 }
 ```  
 
-> ### Use load balanced ethereum client i.e Web3jService  
+> #### Use load balanced ethereum client i.e Web3jService  
 
 ```java
 @Test

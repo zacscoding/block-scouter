@@ -3,14 +3,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <parent>
+    <groupId>com.github.zacscoding</groupId>
     <artifactId>block-scouter</artifactId>
-    <groupId>block-scouter</groupId>
     <version>0.2.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-
-  <artifactId>spring-boot-starter</artifactId>
+  <artifactId>block-scouter-spring-boot-starter</artifactId>
+  <name>Block Scouter Spring Boot Starter</name>
 
   <licenses>
     <license>
@@ -47,8 +48,8 @@
     </dependency>
 
     <dependency>
-      <groupId>block-scouter</groupId>
-      <artifactId>core</artifactId>
+      <groupId>com.github.zacscoding</groupId>
+      <artifactId>block-scouter-core</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -57,12 +58,6 @@
       <artifactId>junit</artifactId>
       <version>4.12</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>block-scouter</groupId>
-      <artifactId>core</artifactId>
-      <version>0.2</version>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 

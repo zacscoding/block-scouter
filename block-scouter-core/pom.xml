@@ -5,13 +5,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <parent>
+    <groupId>com.github.zacscoding</groupId>
     <artifactId>block-scouter</artifactId>
-    <groupId>block-scouter</groupId>
     <version>0.2.1</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>core</artifactId>
+  <artifactId>block-scouter-core</artifactId>
   <packaging>jar</packaging>
   <name>Block Scouter Core</name>
 

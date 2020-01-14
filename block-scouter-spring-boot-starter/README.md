@@ -2,12 +2,10 @@
 
 > ## Getting started  
 
-> ## Getting started
-
-**maven**  
+**Adds repository**  
 
 ```aidl
-
+// maven
 <repositories>
   <repository>
     <id>jcenter</id>
@@ -15,29 +13,30 @@
   </repository>
 </repositories>
 
-...
+// gradle
+repositories {
+  jecenter()
+}
+```  
 
-
-<dependency>
-	<groupId>block-scouter</groupId>
-	<artifactId>spring-boot-starter</artifactId>
-	<version>0.2.1</version>
-</dependency>
-```
-
-**gradle**  
+**Adds dependency**  
 
 ```aidl
+// maven
+<repositories>
+  <repository>
+    <id>jcenter</id>
+    <url>https://jcenter.bintray.com/</url>
+  </repository>
+</repositories>
 
+// gradle
 repositories {
-    jecenter()
+  jecenter()
 }
-
-...
-
-implementation 'block-scoute:spring-boot-starter:0.2.1'
-
 ```  
+
+---  
 
 **application.yaml**  
 

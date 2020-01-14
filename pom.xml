@@ -4,17 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>block-scouter</groupId>
+  <groupId>com.github.zacscoding</groupId>
   <artifactId>block-scouter</artifactId>
   <version>0.2.1</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>core</module>
-    <module>spring-boot-starter</module>
+    <module>block-scouter-core</module>
+    <module>block-scouter-spring-boot-starter</module>
   </modules>
 
-  <name>blockchain scouter</name>
+  <name>Block Scouter</name>
   <description>subscribe blockchains events</description>
   <url>https://github.com/zacscoding/block-scouter</url>
 
