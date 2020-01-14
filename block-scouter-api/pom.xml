@@ -14,6 +14,13 @@
   <name>block-scouter-api</name>
   <description>Demo project for Spring Boot</description>
 
+  <repositories>
+    <repository>
+      <id>jcenter</id>
+      <url>https://jcenter.bintray.com/</url>
+    </repository>
+  </repositories>
+
   <properties>
     <java.version>1.8</java.version>
   </properties>
@@ -43,6 +50,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
       <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.zacscoding</groupId>
+      <artifactId>block-scouter-spring-boot-starter</artifactId>
+      <version>0.2.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>

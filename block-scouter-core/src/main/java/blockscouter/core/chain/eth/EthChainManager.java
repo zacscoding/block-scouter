@@ -192,17 +192,22 @@ public class EthChainManager implements ChainManager<EthNode, EthNodeConfig> {
         loadBalancer = new EthLoadBalancer(healthChecker);
 
         // chain sync task
-        syncEventQueue = new LinkedBlockingQueue<>();
-        syncTask = new EthSyncTask(
-                chainConfig, healthChecker, nodeManager,
-                chainListenerOptional, syncEventQueue, (long) (chainConfig.getBlockTime() * 1.5D)
-        );
-        syncTask.start();
+        if (chainConfig.isSubscribeNewBlocks()) {
+            syncEventQueue = new LinkedBlockingQueue<>();
+            syncTask = new EthSyncTask(
+                    chainConfig, healthChecker, nodeManager,
+                    chainListenerOptional, syncEventQueue, (long) (chainConfig.getBlockTime() * 1.5D)
+            );
+            syncTask.start();
+        }
 
-        // pending transaction batch
-        pendingTransactionBatch = new EthPendingTransactionBatch(chainConfig, chainListenerOptional);
-        pendingTransactionBatch.start(chainConfig.getPendingTransactionBatchMaxSize(),
-                                      Duration.ofSeconds(chainConfig.getPendingTransactionBatchMaxSeconds()));
+        if (chainConfig.isSubscribePendingTransactions()) {
+            // pending transaction batch
+            pendingTransactionBatch = new EthPendingTransactionBatch(chainConfig, chainListenerOptional);
+            pendingTransactionBatch.start(chainConfig.getPendingTransactionBatchMaxSize(),
+                                          Duration.ofSeconds(
+                                                  chainConfig.getPendingTransactionBatchMaxSeconds()));
+        }
 
         final String logging = "\n// ====================================================\n"
                                + "Initialize ethereum chain.\n"

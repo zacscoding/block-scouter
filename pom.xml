@@ -6,7 +6,7 @@
 
   <groupId>com.github.zacscoding</groupId>
   <artifactId>block-scouter</artifactId>
-  <version>0.2.1</version>
+  <version>0.2.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>

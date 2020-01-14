@@ -9,5 +9,4 @@ public class BlockScouterApiApplication {
     public static void main(String[] args) {
         SpringApplication.run(BlockScouterApiApplication.class, args);
     }
-
 }

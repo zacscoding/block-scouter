@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.protocol.Web3jService;
@@ -122,22 +123,18 @@ public class EthHealthIndicator extends HealthIndicator {
     private EthSyncing.Result getSyncingResult() throws Exception {
         try {
             return node.getWeb3j().ethSyncing().send().getResult();
-        } catch (Exception e) {
+        } catch (WebsocketNotConnectedException e) {
+
             final Web3jService web3jService = node.getWeb3jService();
 
-            // throw exception if not web socket service
-            if (!(web3jService instanceof WebSocketService)) {
-                throw e;
-            }
-
-            // if use websocket service, then try to reconnect
-            final WebSocketService webSocketService = (WebSocketService) web3jService;
-
-            if (!webSocketService.isConnected()) {
+            if (web3jService instanceof WebSocketService) {
+                final WebSocketService webSocketService = (WebSocketService) web3jService;
                 webSocketService.connect();
+
+                return node.getWeb3j().ethSyncing().send().getResult();
             }
 
-            return node.getWeb3j().ethSyncing().send().getResult();
+            throw e;
         }
     }
 }

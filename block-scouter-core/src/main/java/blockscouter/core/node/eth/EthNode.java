@@ -118,7 +118,7 @@ public class EthNode implements Node<EthHealthIndicator> {
         try {
             startSubscribe();
         } catch (Exception e) {
-            logger.warn("Exception occur while initialize subscription", e);
+            logger.warn("Exception occur while initialize subscription. skip to start subscription", e);
         }
 
         // health check
