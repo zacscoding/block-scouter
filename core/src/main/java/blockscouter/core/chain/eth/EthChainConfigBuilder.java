@@ -34,6 +34,16 @@ public final class EthChainConfigBuilder {
     private long blockTime = Defaults.BLOCK_TIME;
 
     /**
+     * subscribe new blocks or not
+     */
+    private boolean subscribeNewBlocks = Defaults.SUBSCRIBE_NEW_BLOCKS;
+
+    /**
+     * subscribe pending transactions or not
+     */
+    private boolean subscribePendingTransactions = Defaults.SUBSCRIBE_PENDING_TRANSACTIONS;
+
+    /**
      * pending transaction batch max size
      */
     private int pendingTransactionBatchMaxSize = Defaults.PENDING_TRANSACTION_BATCH_MAX_SIZE;
@@ -61,6 +71,16 @@ public final class EthChainConfigBuilder {
         return this;
     }
 
+    public EthChainConfigBuilder subscribeNewBlocks(boolean subscribeNewBlocks) {
+        this.subscribeNewBlocks = subscribeNewBlocks;
+        return this;
+    }
+
+    public EthChainConfigBuilder subscribePendingTransactions(boolean subscribePendingTransactions) {
+        this.subscribePendingTransactions = subscribePendingTransactions;
+        return this;
+    }
+
     public EthChainConfigBuilder pendingTransactionBatchMaxSize(int pendingTransactionBatchMaxSize) {
         checkArgument(pendingTransactionBatchMaxSize > 0,
                       "pendingTransactionBatchMaxSize must greater than 0");
@@ -78,13 +98,18 @@ public final class EthChainConfigBuilder {
     }
 
     public EthChainConfig build() {
-        return new EthChainConfig(chainId, blockTime, pendingTransactionBatchMaxSize,
+        return new EthChainConfig(chainId, blockTime,
+                                  subscribeNewBlocks,
+                                  subscribePendingTransactions,
+                                  pendingTransactionBatchMaxSize,
                                   pendingTransactionBatchMaxSeconds);
     }
 
     private static final class Defaults {
         private static final String CHAIN_ID = "0";
         private static final long BLOCK_TIME = 1500L;
+        private static final boolean SUBSCRIBE_NEW_BLOCKS = true;
+        private static final boolean SUBSCRIBE_PENDING_TRANSACTIONS = true;
         private static final int PENDING_TRANSACTION_BATCH_MAX_SIZE = 100;
         private static final int PENDING_TRANSACTION_BATCH_MAX_SECONDS = 5;
     }

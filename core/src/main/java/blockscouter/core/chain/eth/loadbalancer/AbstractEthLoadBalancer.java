@@ -106,8 +106,7 @@ public abstract class AbstractEthLoadBalancer {
             node = nodes.get(nextServerIndex);
 
             if (node.getHealthIndicator().isAlive()) {
-                System.out.println(">> Choose  ==> " + node);
-                logger.debug("Choose {}", node);
+                logger.trace("Choose {}", node);
                 return node;
             }
         }

@@ -17,7 +17,9 @@
 package blockscouter.core.dev;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jService;
@@ -46,6 +48,7 @@ import io.reactivex.disposables.Disposable;
 /**
  *
  */
+@Disabled
 public class EthChainUsageTest {
 
     @Test
@@ -143,15 +146,19 @@ public class EthChainUsageTest {
 
         // choose node1
         String node1ClientVersion = web3j.web3ClientVersion().send().getWeb3ClientVersion();
+        System.out.println(node1ClientVersion);
         // choose node2
         String node2ClientVersion = web3j.web3ClientVersion().send().getWeb3ClientVersion();
+        System.out.println(node2ClientVersion);
 
         /**
          * Download block [0, 10]
          */
         // Try to request getBlockByNumber(X) by load balanced Web3jService
+        final CountDownLatch completeLatch = new CountDownLatch(1);
         EthBlockDownloader downloader = EthBlockDownloader.buildDownloader(web3jService);
-        Flowable<EthDownloadBlock> ethDownloadBlockFlowable = downloader.downloadBlocks(0L, 10L);
+        // Flowable<EthDownloadBlock> ethDownloadBlockFlowable = downloader.downloadBlocks(1L, 10L);
+        Flowable<EthDownloadBlock> ethDownloadBlockFlowable = downloader.downloadBlocks(10L, 1L);
         Disposable subscription =
                 ethDownloadBlockFlowable.subscribe(
                         result -> {
@@ -160,8 +167,17 @@ public class EthChainUsageTest {
                                 Transaction tx = (Transaction) transaction;
                                 TransactionReceipt tr = result.getReceiptMap().get(tx.getHash());
                             }
+                            System.out.println("## Downloaded block : " + block.getNumber()
+                                               + " ==> #txns :" + block.getTransactions().size()
+                                               + " , #receipts : " + result.getReceiptMap().size());
                         },
                         throwable -> throwable.printStackTrace(System.err),
-                        () -> System.out.println("onComplete to download"));
+                        () -> {
+                            System.out.println("onComplete to download");
+                            completeLatch.countDown();
+                        });
+
+        completeLatch.await();
+        subscription.dispose();
     }
 }

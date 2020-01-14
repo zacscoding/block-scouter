@@ -34,6 +34,16 @@ public class EthChainConfig implements Cloneable {
     private final long blockTime;
 
     /**
+     * subscribe new blocks or not
+     */
+    private final boolean subscribeNewBlocks;
+
+    /**
+     * subscribe pending transactions or not
+     */
+    private final boolean subscribePendingTransactions;
+
+    /**
      * pending transaction batch max size
      */
     private final int pendingTransactionBatchMaxSize;
@@ -43,11 +53,14 @@ public class EthChainConfig implements Cloneable {
      */
     private final int pendingTransactionBatchMaxSeconds;
 
-    EthChainConfig(String chainId, long blockTime, int pendingTransactionBatchMaxSize,
-                   int pendingTransactionBatchMaxSeconds) {
+    public EthChainConfig(String chainId, long blockTime, boolean subscribeNewBlocks,
+                          boolean subscribePendingTransactions, int pendingTransactionBatchMaxSize,
+                          int pendingTransactionBatchMaxSeconds) {
 
         this.chainId = chainId;
         this.blockTime = blockTime;
+        this.subscribeNewBlocks = subscribeNewBlocks;
+        this.subscribePendingTransactions = subscribePendingTransactions;
         this.pendingTransactionBatchMaxSize = pendingTransactionBatchMaxSize;
         this.pendingTransactionBatchMaxSeconds = pendingTransactionBatchMaxSeconds;
     }
@@ -58,6 +71,14 @@ public class EthChainConfig implements Cloneable {
 
     public long getBlockTime() {
         return blockTime;
+    }
+
+    public boolean isSubscribeNewBlocks() {
+        return subscribeNewBlocks;
+    }
+
+    public boolean isSubscribePendingTransactions() {
+        return subscribePendingTransactions;
     }
 
     public int getPendingTransactionBatchMaxSize() {
@@ -74,6 +95,8 @@ public class EthChainConfig implements Cloneable {
                 .toStringHelper(this)
                 .add("chainId", chainId)
                 .add("blockTime", blockTime)
+                .add("subscribeNewBlocks", subscribeNewBlocks)
+                .add("subscribePendingTransactions", subscribePendingTransactions)
                 .add("pendingTransactionBatchMaxSize", pendingTransactionBatchMaxSize)
                 .add("pendingTransactionBatchMaxSeconds", pendingTransactionBatchMaxSeconds)
                 .toString();
@@ -81,7 +104,7 @@ public class EthChainConfig implements Cloneable {
 
     @Override
     public EthChainConfig clone() {
-        return new EthChainConfig(chainId, blockTime,
+        return new EthChainConfig(chainId, blockTime, subscribeNewBlocks, subscribePendingTransactions,
                                   pendingTransactionBatchMaxSize, pendingTransactionBatchMaxSeconds);
     }
 }

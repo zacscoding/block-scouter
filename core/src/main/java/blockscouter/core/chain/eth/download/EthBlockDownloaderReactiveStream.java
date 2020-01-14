@@ -62,8 +62,13 @@ public class EthBlockDownloaderReactiveStream implements EthBlockDownloader {
                 .subscribeOn(scheduler);
     }
 
-    private Flowable<EthDownloadBlock> downloadBlocksFlowableSync(final long start, final long end,
-                                                                  boolean ascending) {
+    private Flowable<EthDownloadBlock> downloadBlocksFlowableSync(long start, long end, boolean ascending) {
+
+        if (!ascending) {
+            long t = start;
+            start = end;
+            end = t;
+        }
 
         final BigInteger startBlockNumber = BigInteger.valueOf(start);
         final BigInteger endBlockNumber = BigInteger.valueOf(end);

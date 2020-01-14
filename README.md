@@ -15,6 +15,14 @@
 
 ---  
 
+## Modules  
+
+- **core** : block scouter core module  
+- **spring-boot-starter** : spring boot auto configure for block-scouter
+- **block-scouter-api** : block scouter api server example(support searching blockchain data)  
+
+---  
+
 > ## Getting started
 
 **maven**  
@@ -32,9 +40,9 @@
 
 
 <dependency>
-	<groupId>com.github.zacscoding</groupId>
-	<artifactId>block-scouter</artifactId>
-	<version>0.1</version>
+	<groupId>block-scouter</groupId>
+	<artifactId>core</artifactId>
+	<version>0.2</version>
 </dependency>
 ```
 
@@ -48,15 +56,15 @@ repositories {
 
 ...
 
-compile 'com.github.zacscoding:block-scouter:0.1'
+implementation 'block-scouter:core:0.2'
 
-```  
+```
 
 ---  
 
 ## Usage of ethereum chain  
 
-<a href="core/src/test/java/blockscouter/core/dev/EthChainUsageTest.java">See example code</a>  
+<a href="core/src/test/java/blockscouter/block-scouter-core/dev/EthChainUsageTest.java">See example code</a>  
 
 > ### Build a EthChainManager  
 
@@ -169,10 +177,6 @@ public void runTests() throws Exception {
 @Test
 public void runTests() throws Exception {    
     ...
-
-    /**
-     * Download blocks from 0 to 10 i.e [0,10] with load balanced requests    
-     */
     // Try to request getBlockByNumber(X) by load balanced Web3jService
     // EthDownloadBlock contains a block with transactions, transaction receipts in this block
     Flowable<EthDownloadBlock> ethDownloadBlockFlowable = downloader.downloadBlocks(0L, 10L);
