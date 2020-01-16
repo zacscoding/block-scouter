@@ -17,6 +17,7 @@
 package blockscouter.spring.starter;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -24,6 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.web3j.protocol.core.methods.response.Transaction;
 
 import blockscouter.core.chain.ChainFactory;
 import blockscouter.core.chain.eth.EthChainConfig;
@@ -31,6 +33,7 @@ import blockscouter.core.chain.eth.EthChainConfigBuilder;
 import blockscouter.core.chain.eth.EthChainFactory;
 import blockscouter.core.chain.eth.EthChainListener;
 import blockscouter.core.chain.eth.EthChainManager;
+import blockscouter.core.chain.eth.event.EthBestBlockResult;
 import blockscouter.core.health.eth.EthHealthIndicatorType;
 import blockscouter.core.health.eth.EthHealthIndicatorType.EthConnectedOnly;
 import blockscouter.core.health.eth.EthHealthIndicatorType.EthSynchronized;
@@ -60,6 +63,27 @@ public class BlockScouterAutoConfiguration {
 
         this.blockScouterProperties = blockScouterProperties;
         this.ethChainListener = ethChainListener;
+    }
+
+    @Bean
+    public EthChainListener ethChainListener() {
+        return new EthChainListener() {
+            @Override
+            public void onNewBlocks(EthChainConfig chainConfig, EthBestBlockResult result) {
+
+            }
+
+            @Override
+            public void onPendingTransactions(EthChainConfig chainConfig,
+                                              List<Transaction> pendingTransactions) {
+
+            }
+
+            @Override
+            public void prepareNewChain(EthChainConfig chainConfig) {
+
+            }
+        };
     }
 
     // ==== ethereum
