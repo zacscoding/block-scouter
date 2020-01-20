@@ -53,9 +53,9 @@ public class EthChainConfig implements Cloneable {
      */
     private final int pendingTransactionBatchMaxSeconds;
 
-    public EthChainConfig(String chainId, long blockTime, boolean subscribeNewBlocks,
-                          boolean subscribePendingTransactions, int pendingTransactionBatchMaxSize,
-                          int pendingTransactionBatchMaxSeconds) {
+    EthChainConfig(String chainId, long blockTime, boolean subscribeNewBlocks,
+                   boolean subscribePendingTransactions, int pendingTransactionBatchMaxSize,
+                   int pendingTransactionBatchMaxSeconds) {
 
         this.chainId = chainId;
         this.blockTime = blockTime;

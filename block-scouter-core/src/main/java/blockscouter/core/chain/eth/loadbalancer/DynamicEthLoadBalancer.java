@@ -29,14 +29,14 @@ import blockscouter.core.health.eth.EthHealthIndicator;
 import blockscouter.core.node.eth.EthNode;
 
 /**
- * Ethereum load balancer based on {@link EthHealthChecker}
+ * Dynamic ethereum load balancer based on {@link EthHealthChecker}
  */
-public class EthLoadBalancer extends AbstractEthLoadBalancer {
+public class DynamicEthLoadBalancer extends AbstractEthLoadBalancer {
 
     private final EthHealthChecker healthChecker;
     private final AtomicInteger nextServerCounter;
 
-    public EthLoadBalancer(EthHealthChecker healthChecker) {
+    public DynamicEthLoadBalancer(EthHealthChecker healthChecker) {
         this.healthChecker = checkNotNull(healthChecker, "healthChecker");
         nextServerCounter = new AtomicInteger(0);
     }

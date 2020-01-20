@@ -192,6 +192,13 @@ public class EthNode implements Node<EthHealthIndicator> {
         return Optional.of(nodeObserver.getPendingTransactionStream());
     }
 
+    /**
+     * Returns a {@link EthNodeConfig}
+     */
+    public EthNodeConfig getNodeConfig() {
+        return nodeConfig;
+    }
+
     // start to subscribe new blocks, pending transactions
     private void startSubscribe() {
         if (nodeConfig.isSubscribeNewBlock()) {

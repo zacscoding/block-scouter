@@ -71,6 +71,10 @@ EthChainConfig chainConfig = EthChainConfigBuilder.builder()
                                                   .chainId("36435")
                                                   // average block time
                                                   .blockTime(5000L)
+                                                  // subscribe new block
+                                                  .subscribeNewBlocks(true)
+                                                  // subscribe new pending transaction
+                                                  .subscribePendingTransactions(true)
                                                   // pending tx buffer max size
                                                   .pendingTransactionBatchMaxSize(3)
                                                   // pending tx buffer max seconds

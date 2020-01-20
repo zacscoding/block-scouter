@@ -35,7 +35,7 @@ import com.codahale.metrics.health.HealthCheck.Result;
 import blockscouter.core.chain.ChainManager;
 import blockscouter.core.chain.eth.event.EthNewPeerEvent;
 import blockscouter.core.chain.eth.event.EthSyncEvent;
-import blockscouter.core.chain.eth.loadbalancer.EthLoadBalancer;
+import blockscouter.core.chain.eth.loadbalancer.DynamicEthLoadBalancer;
 import blockscouter.core.health.eth.EthHealthChecker;
 import blockscouter.core.health.eth.EthHealthIndicator;
 import blockscouter.core.node.eth.EthNode;
@@ -57,7 +57,7 @@ public class EthChainManager implements ChainManager<EthNode, EthNodeConfig> {
     private final EthRpcServiceFactory rpcServiceFactory;
 
     // post constructed
-    private EthLoadBalancer loadBalancer;
+    private DynamicEthLoadBalancer loadBalancer;
     private EthHealthChecker healthChecker;
     private LinkedBlockingQueue<EthSyncEvent> syncEventQueue;
     private EthSyncTask syncTask;
@@ -106,15 +106,17 @@ public class EthChainManager implements ChainManager<EthNode, EthNodeConfig> {
 
             // pending transaction subscribe
             final Optional<Publisher<String>> pendingTxStream = node.getPendingTransactionStream();
-            if (pendingTxStream.isPresent()) {
-                // TODO : adds a batch
+
+            if (pendingTxStream.isPresent() && pendingTransactionBatch != null) {
+                pendingTransactionBatch.subscribePendingTx(node, pendingTxStream.get());
             }
 
-            // publish new node event
+            // publish new peer event
             if (publishNewNodeEvent) {
-
+                syncEventQueue.offer(EthNewPeerEvent.INSTANCE);
             }
-            logger.debug("success to add a eth node");
+
+            logger.debug("success to add a eth node : {}", node.getNodeConfig());
         } catch (Exception e) {
             logger.warn("Exception occur while adding a {}}", nodeConfig, e);
             removeNode(nodeConfig.getName());
@@ -189,7 +191,7 @@ public class EthChainManager implements ChainManager<EthNode, EthNodeConfig> {
         healthChecker.start(100L, chainConfig.getBlockTime());
 
         // loadbalancer
-        loadBalancer = new EthLoadBalancer(healthChecker);
+        loadBalancer = new DynamicEthLoadBalancer(healthChecker);
 
         // chain sync task
         if (chainConfig.isSubscribeNewBlocks()) {
@@ -217,16 +219,13 @@ public class EthChainManager implements ChainManager<EthNode, EthNodeConfig> {
     }
 
     private void handleHealthStateChange(EthHealthIndicator indicator, Result prev, Result current) {
-        logger.debug(
-                "Ethereum node health state is changed. name : {} / prev healthy : {} / current healthy: {}"
-                , indicator.getName(), prev.isHealthy(), current.isHealthy());
+        logger.debug("Ethereum node health state is changed. name : {} / prev healthy : {} / "
+                     + "current healthy: {}", indicator.getName(), prev.isHealthy(), current.isHealthy());
 
         // 1) notify health state changed to a node
         final Optional<EthNode> node = nodeManager.getNode(chainConfig.getChainId(), indicator.getName());
 
-        if (node.isPresent()) {
-            node.get().onHealthStateChange(current);
-        }
+        node.ifPresent(ethNode -> ethNode.onHealthStateChange(current));
 
         // 2) publish new peer event
         syncEventQueue.offer(EthNewPeerEvent.INSTANCE);
